@@ -252,7 +252,7 @@ if (page.chartType === 'bubble') {
 
     // Set a fixed height for the chart container
     const chartContainer = document.getElementById('myChart').parentElement;
-    chartContainer.style.height = '300px';  // Same height for all chart types
+    chartContainer.style.height = '450px';  // Same height for all chart types
 
     // Create a new chart
     const ctx = document.getElementById('myChart').getContext('2d');
