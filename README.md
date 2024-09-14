@@ -1,2 +1,2 @@
-# HauntedBI
+# EerieBI
 A Halloween Data Mystery
