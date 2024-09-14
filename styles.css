@@ -1,0 +1,93 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Fixed Corporate Banner */
+header {
+    background-color: #357a38; /* Green corporate banner */
+    color: white;
+    padding: 10px;
+    text-align: center;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+}
+
+header h1 {
+    font-size: 1.5em;
+    margin-bottom: 5px;
+}
+
+header p {
+    font-size: 0.9em;
+}
+
+/* Main Content */
+main {
+    padding: 70px 20px 20px; /* Padding to avoid the fixed banner */
+}
+
+.content {
+    text-align: center;
+}
+
+#page-title {
+    font-size: 1.8em;
+    margin-bottom: 10px;
+}
+
+#subtitle {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+}
+
+/* Chart and Table Placeholders */
+#chart-container, #table-container {
+    background-color: #e0e0e0; /* Light grey placeholder */
+    padding: 20px;
+    margin: 10px auto;
+    max-width: 50%;
+    border-radius: 10px;
+}
+
+#chart-container p, #table-container p {
+    font-size: 1.2em;
+    color: #757575;
+}
+
+/* Navigation Buttons */
+.navigation {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+button {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1em;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+}
+
+button:hover {
+    background-color: #555;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    button {
+        font-size: 0.9em;
+    }
+}

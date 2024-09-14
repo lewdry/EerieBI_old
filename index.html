@@ -3,134 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HauntedBI</title>
-    <style>
-        body {
-            background-color: black;
-            color: white;
-            font-family: 'Creepster', cursive;
-            overflow: hidden;
-        }
-
-        canvas {
-            position: relative;
-            max-width: 80%;
-            margin: auto;
-            display: block;
-            z-index: 1;
-        }
-
-        /* Dripping blood effect */
-        .blood-drip {
-            position: absolute;
-            width: 3px;
-            height: 50px;
-            background-color: red;
-            animation: drip 2.5s infinite;
-            z-index: 2;
-            opacity: 0.8;
-        }
-
-        /* Blood splatter effect */
-        .blood-splatter {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: red;
-            border-radius: 50%;
-            z-index: 3;
-            opacity: 0.8;
-        }
-
-        @keyframes drip {
-            0% {
-                transform: translateY(0);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(400px);
-                opacity: 0;
-            }
-        }
-    </style>
+    <title>Eerie-BI</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>HauntedBI</h1>
-    <canvas id="hauntedChart" width="400" height="400"></canvas>
+    <header>
+        <div class="banner">
+            <h1>Eerie-BI</h1>
+            <p>Executive Earnings Report & Insights Exchange</p>
+        </div>
+    </header>
 
-    <!-- Dynamic blood drips -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        const ctx = document.getElementById('hauntedChart').getContext('2d');
+    <main>
+        <section>
+            <h2 id="page-title">Page Title</h2>
+            <h3 id="subtitle">Subtitle</h3>
+
+            <div class="chart-container" id="chart-container">
+                <canvas id="myChart"></canvas>
+            </div>
+            
+            <div class="table-container" id="table-container">
+                <p id="table-text">Table or Text Content</p>
+            </div>
+        </section>
         
-        // Initialize the chart
-        const hauntedChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Spooky', 'Creepy', 'Eerie', 'Haunting'],
-                datasets: [{
-                    label: 'Fear Levels',
-                    data: [12, 19, 3, 5],
-                    backgroundColor: 'rgba(255, 0, 0, 0.6)', // Blood red
-                    borderColor: 'rgba(255, 0, 0, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                },
-                onHover: function(event) {
-                    const mouseX = event.native.offsetX;
-                    const mouseY = event.native.offsetY;
-                    createBloodSplatter(mouseX, mouseY);
-                },
-                onClick: function(event) {
-                    const mouseX = event.native.offsetX;
-                    const mouseY = event.native.offsetY;
-                    createBloodSplatter(mouseX, mouseY);
-                }
-            }
-        });
+        <div class="navigation">
+            <button id="back-button">Back</button>
+            <button id="next-button">Next</button>
+        </div>
+    </main>
 
-        // Function to create a blood drip effect on the chart
-        function createBloodDrip() {
-            const canvas = document.getElementById('hauntedChart');
-            const canvasRect = canvas.getBoundingClientRect();
-
-            const drip = document.createElement('div');
-            drip.className = 'blood-drip';
-            drip.style.left = `${Math.random() * canvasRect.width}px`;
-            drip.style.top = '0px';
-            drip.style.height = `${Math.random() * 50 + 30}px`;
-
-            document.body.appendChild(drip);
-
-            // Remove the drip after animation completes
-            setTimeout(() => {
-                drip.remove();
-            }, 3000);
-        }
-
-        // Function to create a blood splatter effect at mouse location
-        function createBloodSplatter(x, y) {
-            const splatter = document.createElement('div');
-            splatter.className = 'blood-splatter';
-            splatter.style.left = `${x - 10}px`;  // Adjust for splatter size
-            splatter.style.top = `${y - 10}px`;
-
-            document.body.appendChild(splatter);
-
-            // Remove the splatter after a short duration
-            setTimeout(() => {
-                splatter.remove();
-            }, 1000);
-        }
-
-        // Create multiple blood drips across the canvas area
-        setInterval(createBloodDrip, 1000);
-    </script>
+    <script src="eerie.js"></script>
 </body>
 </html>
