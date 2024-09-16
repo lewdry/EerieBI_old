@@ -175,7 +175,7 @@ function loadPage(pageIndex) {
                         callbacks: {
                             label: function(context) {
                                 if (context.dataIndex === 2) {
-                                    return 'Okay, just one really, me and I need your help';
+                                    return '1. Me and I need your help';
                                 }
                                 return context.formattedValue;
                             }
