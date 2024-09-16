@@ -4,32 +4,32 @@ let myChart;
 // Array to store data for each page
 const pages = [
     {
-        title: 'October 24 Lookback',
+        title: 'October 24',
         subtitle: 'Earnings',
-        chartType: 'bar',
+        chartType: 'line',
         chartData: {
             labels: ['A', 'B', 'C'],
             datasets: [{
                 label: 'Aug-Oct ($M)',
-                data: [10, 20, 30],
+                data: [21, 20, 22.5],
                 backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(75, 192, 192, 0.2)']
             }]
         },
         tableContent: {
-            headers: ['Name', 'Value', 'Percentage'],
+            headers: ['Name', 'Hello!', '$'],
             rows: [
-                ['Please', '10', '33%'],
-                ['Help', '20', '66%'],
-                ['Me', '30', '100%']
+                ['Aug', 'please', '21m'],
+                ['Sep', 'help', '20m'],
+                ['Oct', 'me', '22.5']
             ]
         }
     },
     {
         title: 'Employee Overview',
         subtitle: 'Headcount',
-        chartType: 'pie',
+        chartType: 'bar',
         chartData: {
-            labels: ['Ongoing', 'Temp', 'Died Under Mysterious Cirumstances'],
+            labels: ['Ongoing', 'Temp', 'Died Under Mysterious Circumstances'],
             datasets: [{
                 label: 'Employees',
                 data: [81, 12, 1],
@@ -37,11 +37,11 @@ const pages = [
             }]
         },
         tableContent: {
-            headers: ['Name', 'Value', 'Percentage'],
+            headers: ['Type', 'Count'],
             rows: [
-                ['Item A', '10', '33%'],
-                ['Item B', '20', '66%'],
-                ['Item C', '30', '100%']
+                ['Ongoing', '81'],
+                ['Temp', '12'],
+                ['Died Under Mysterious Circumstances', '1']
             ]
         } 
     },
@@ -54,29 +54,25 @@ const pages = [
                 label: 'Sales by Region',
                 data: [
                     { x: 'North America', y: 120000, r: 20 },
-                    { x: 'Europe', y: 90000, r: 15 },
                     { x: 'Asia', y: 150000, r: 25 },
                     { x: 'Australia', y: 60000, r: 10 }
                 ],
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
                     'rgba(75, 192, 192, 0.2)',
                     'rgba(255, 205, 86, 0.2)'
                 ],
                 borderColor: [
                     'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
                     'rgba(75, 192, 192, 1)',
                     'rgba(255, 205, 86, 1)'
                 ]
             }]
         },
         tableContent: {
-            headers: ['Region', 'Sales', 'Market Share'],
+            headers: ['Region', 'Sales', 'Share'],
             rows: [
                 ['North America', '$120,000', '28.6%'],
-                ['Europe', '$90,000', '21.4%'],
                 ['Asia', '$150,000', '35.7%'],
                 ['Australia', '$60,000', '14.3%']
             ]
@@ -128,14 +124,63 @@ function loadPage(pageIndex) {
         }
     };
 
-    // Special configuration for pie chart
-    if (page.chartType === 'pie') {
-        chartConfig.options = {
-            ...chartConfig.options,
-            aspectRatio: 2,  // Adjust this value to change the aspect ratio
-            plugins: {
-                legend: {
-                    position: 'top',
+    if (page.chartType === 'bar') {
+        chartConfig = {
+            type: 'bar',
+            data: {
+                labels: page.chartData.labels,
+                datasets: [{
+                    label: page.chartData.datasets[0].label,
+                    data: page.chartData.datasets[0].data.map((value, index) => 
+                        index === 2 ? 100 : value  // Make the third bar (index 2) much larger
+                    ),
+                    backgroundColor: page.chartData.datasets[0].backgroundColor,
+                    borderColor: 'rgba(0, 0, 0, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100  // Set the max value to 100
+                    }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutQuart',
+                    onComplete: function(animation) {
+                        const chartInstance = animation.chart;
+                        const ctx = chartInstance.ctx;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'bottom';
+                        ctx.font = 'bold 14px Arial';
+                        ctx.fillStyle = 'red';
+    
+                        this.data.datasets.forEach(function (dataset, datasetIndex) {
+                            const meta = chartInstance.getDatasetMeta(datasetIndex);
+                            meta.data.forEach(function (bar, index) {
+                                if (index === 2) {  // Only for the third bar
+                                    const data = dataset.data[index];
+                                    ctx.fillText('!!!', bar.x, bar.y - 5);
+                                }
+                            });
+                        });
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                if (context.dataIndex === 2) {
+                                    return 'Okay, just one really, me and I need your help';
+                                }
+                                return context.formattedValue;
+                            }
+                        }
+                    }
                 }
             }
         };
@@ -250,9 +295,38 @@ if (page.chartType === 'bubble') {
     }, 50);
 }
 
-    // Set a fixed height for the chart container
+function adjustLayout() {
+    const container = document.getElementById('container');
+    const windowHeight = window.innerHeight;
+    const windowWidth = window.innerWidth;
+    const aspectRatio = 3 / 2;
+
+    let containerHeight, containerWidth;
+
+    if (windowWidth / windowHeight > aspectRatio) {
+        // Window is wider than desired aspect ratio
+        containerHeight = windowHeight;
+        containerWidth = containerHeight * aspectRatio;
+    } else {
+        // Window is taller than desired aspect ratio
+        containerWidth = windowWidth;
+        containerHeight = containerWidth / aspectRatio;
+    }
+
+    container.style.width = `${containerWidth}px`;
+    container.style.height = `${containerHeight}px`;
+
+    // Adjust font sizes
+    const baseFontSize = containerHeight * 0.02; // 2% of container height
+    document.documentElement.style.fontSize = `${baseFontSize}px`;
+
+    // Adjust chart size
     const chartContainer = document.getElementById('myChart').parentElement;
-    chartContainer.style.height = '300x';  // Same height for all chart types
+    chartContainer.style.height = `${containerHeight * 0.3}px`; // 30% of container height
+
+    // Reload the current page to redraw the chart with new dimensions
+    loadPage(currentPageIndex);
+}
 
     // Create a new chart
     const ctx = document.getElementById('myChart').getContext('2d');
@@ -338,3 +412,11 @@ addEventListeners();
 window.addEventListener('resize', () => {
     loadPage(currentPageIndex);
 });
+
+// Call adjustLayout on initial load and resize
+window.addEventListener('load', adjustLayout);
+window.addEventListener('resize', adjustLayout);
+
+// Replace the existing resize event listener
+window.removeEventListener('resize', loadPage);
+window.addEventListener('resize', adjustLayout);

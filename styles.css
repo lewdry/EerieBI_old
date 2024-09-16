@@ -5,15 +5,34 @@
     box-sizing: border-box;
 }
 
+body, html {
+    height: 100%;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+}
+
+#container {
+    background-color: white;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+}
+
 /* Fixed Corporate Banner */
 header {
     background-color: #357a38; /* Green corporate banner */
     color: white;
     padding: 10px;
     text-align: center;
-    position: fixed;
     width: 100%;
-    top: 0;
     z-index: 1000;
 }
 
@@ -28,7 +47,12 @@ header p {
 
 /* Main Content */
 main {
-    padding: 70px 20px 20px; /* Padding to avoid the fixed banner */
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow-y: auto;
+    padding: 20px;
 }
 
 .content {
@@ -45,17 +69,27 @@ main {
     margin-bottom: 20px;
 }
 
-/* Chart and Table Placeholders */
+/* Chart and Table Containers */
 #chart-container, #table-container {
     background-color: #e0e0e0; /* Light grey placeholder */
     padding: 20px;
     margin: 10px auto;
-    max-width: 90%;
+    width: 100%;
     border-radius: 10px;
 }
 
+#chart-container {
+    height: 30%;
+    min-height: 100px;
+}
+
+#table-container {
+    height: 40%;
+    overflow-y: auto;
+}
+
 #chart-container p, #table-container p {
-    font-size: 1.2em;
+    font-size: 1em;
     color: #757575;
 }
 
@@ -64,6 +98,7 @@ main {
     display: flex;
     justify-content: space-between;
     padding: 20px;
+    width: 100%;
 }
 
 button {
@@ -90,4 +125,36 @@ button:hover {
     button {
         font-size: 0.9em;
     }
+    
+    header h1 {
+        font-size: 1em;
+    }
+    
+    header p {
+        font-size: 0.8em;
+    }
+    
+    #page-title {
+        font-size: 1.2em;
+    }
+    
+    #subtitle {
+        font-size: 0.8em;
+    }
+}
+
+/* Table Styles */
+#table-text table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#table-text th, #table-text td {
+    border: 1px solid #ddd;
+    padding: 0.5rem;
+    text-align: left;
+}
+
+#table-text th {
+    background-color: #f2f2f2;
 }
