@@ -8,7 +8,7 @@ const pages = [
         subtitle: 'Earnings',
         chartType: 'line',
         chartData: {
-            labels: ['A', 'B', 'C'],
+            labels: ['Aug', 'Sep', 'Oct'],
             datasets: [{
                 label: 'Aug-Oct ($M)',
                 data: [21, 20, 22.5],
@@ -16,7 +16,7 @@ const pages = [
             }]
         },
         tableContent: {
-            headers: ['Name', 'Hello!', '$'],
+            headers: ['Month', 'Description', '$'],
             rows: [
                 ['Aug', 'please', '21m'],
                 ['Sep', 'help', '20m'],
@@ -75,6 +75,28 @@ const pages = [
                 ['North America', '$120,000', '28.6%'],
                 ['Asia', '$150,000', '35.7%'],
                 ['Australia', '$60,000', '14.3%']
+            ]
+        }
+    },
+    {
+        title: 'Unexplained Deaths',
+        subtitle: 'To be solved',
+        chartType: 'pie',
+        chartData: {
+            labels: ['Mine', 'Yours'],
+            datasets: [{
+                label: 'Deaths',
+                data: [1,1],
+                backgroundColor: ['rgba(0, 0, 0, 0.8)', 'rgba(255, 255, 255, 0.8)'],
+                hoverBackgroundColor: ['rgba(50, 50, 50, 0.8)', 'rgba(200, 200, 200, 0.8)']
+            }]
+        },
+        tableContent: {
+            headers: ['If', 'you', 'help'],
+            rows: [
+                ['Solve', 'my', 'death'],
+                ['I', 'will', 'rest'],
+                ['I', 'need', 'closure']
             ]
         }
     },
@@ -287,6 +309,31 @@ function loadPage(pageIndex) {
             document.head.appendChild(style);
             break;
 
+        case 'pie':
+            // Add any specific configurations for pie chart if needed
+            chartConfig.options = {
+                ...chartConfig.options,
+                // Add title and other options if necessary
+                // ...
+            };
+
+            // Update data for the pie chart
+            chartConfig.data = {
+                labels: ['Mine', 'Yours'], // Labels for the pie slices
+                datasets: [{
+                    label: 'Deaths', // Optional label for the dataset
+                    data: [1,1],
+                    backgroundColor: [
+                        'rgba(0, 0, 0, 0.8)', 'rgba(255, 255, 255, 0.8)',
+                    ],
+                    borderColor: [
+                        'rgba(0, 0, 0, 1)', 'rgba(0, 0, 0, 1)', // Example border color for solved
+                    ],
+                    borderWidth: 1
+                }]
+            };
+            break;
+
         default:
             console.error('Unsupported chart type');
             return;
@@ -316,7 +363,7 @@ function adjustLayout() {
     const windowHeight = window.innerHeight;
     const windowWidth = window.innerWidth;
     const maxWidth = 1000;
-    const aspectRatio = 2; // height:width ratio of 2:1
+    const aspectRatio = 1.8; // height:width ratio of 1.8:1
 
     let containerWidth, containerHeight;
 
