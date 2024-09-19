@@ -58,9 +58,9 @@ const pages = [
                     { x: 'Australia', y: 60000, r: 10 }
                 ],
                 backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(255, 205, 86, 0.2)'
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(255, 205, 86, 0.6)'
                 ],
                 borderColor: [
                     'rgba(255, 99, 132, 1)',
@@ -114,34 +114,31 @@ function loadPage(pageIndex) {
         myChart.destroy();
     }
 
+    // Remove any existing styles for the haunted effect
+    const existingStyle = document.getElementById('chart-style');
+    if (existingStyle) {
+        existingStyle.remove();
+    }
+
     // Create a new chart configuration
     let chartConfig = {
         type: page.chartType,
-        data: page.chartData,
+        data: JSON.parse(JSON.stringify(page.chartData)), // Deep clone the data
         options: {
             responsive: true,
             maintainAspectRatio: false
         }
     };
 
-    if (page.chartType === 'bar') {
-        chartConfig = {
-            type: 'bar',
-            data: {
-                labels: page.chartData.labels,
-                datasets: [{
-                    label: page.chartData.datasets[0].label,
-                    data: page.chartData.datasets[0].data.map((value, index) => 
-                        index === 2 ? 100 : value  // Make the third bar (index 2) much larger
-                    ),
-                    backgroundColor: page.chartData.datasets[0].backgroundColor,
-                    borderColor: 'rgba(0, 0, 0, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
+    // Configure chart based on type
+    switch (page.chartType) {
+        case 'line':
+            // Add any specific configurations for line chart if needed
+            break;
+
+        case 'bar':
+            chartConfig.options = {
+                ...chartConfig.options,
                 scales: {
                     y: {
                         beginAtZero: true,
@@ -158,7 +155,7 @@ function loadPage(pageIndex) {
                         ctx.textBaseline = 'bottom';
                         ctx.font = 'bold 14px Arial';
                         ctx.fillStyle = 'red';
-    
+
                         this.data.datasets.forEach(function (dataset, datasetIndex) {
                             const meta = chartInstance.getDatasetMeta(datasetIndex);
                             meta.data.forEach(function (bar, index) {
@@ -175,146 +172,174 @@ function loadPage(pageIndex) {
                         callbacks: {
                             label: function(context) {
                                 if (context.dataIndex === 2) {
-                                    return '1. Me and I need your help';
+                                    return 'Just 1 and I need your help';
                                 }
                                 return context.formattedValue;
                             }
                         }
                     }
                 }
-            }
-        };
+            };
+
+            // Modify the data for the bar chart
+            chartConfig.data.datasets[0].data = chartConfig.data.datasets[0].data.map((value, index) => 
+                index === 2 ? 100 : value  // Make the third bar (index 2) much larger
+            );
+            break;
+
+        case 'bubble':
+            const bubbleData = chartConfig.data.datasets[0].data;
+            chartConfig = {
+                type: 'bubble',
+                data: {
+                    datasets: [{
+                        label: chartConfig.data.datasets[0].label,
+                        data: bubbleData.map((item, index) => ({
+                            x: index,
+                            y: item.y,
+                            r: item.r
+                        })),
+                        backgroundColor: chartConfig.data.datasets[0].backgroundColor,
+                        borderColor: chartConfig.data.datasets[0].borderColor,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'category',
+                            labels: bubbleData.map(item => item.x),
+                            title: {
+                                display: true,
+                                text: 'Region',
+                                color: 'rgba(255, 255, 255, 0.8)'
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.8)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.2)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Sales',
+                                color: 'rgba(255, 255, 255, 0.8)'
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.8)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.2)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'rgba(255, 255, 255, 0.8)'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.raw.x}: $${context.raw.y.toLocaleString()} (${context.raw.r}% market share)`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            };
+
+            // Add CSS for haunted effect only for the bubble chart
+            const style = document.createElement('style');
+            style.id = 'chart-style';
+            style.textContent = `
+                @keyframes hauntedShake {
+                    0% { transform: translate(1px, 1px) rotate(0deg); }
+                    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+                    20% { transform: translate(-3px, 0px) rotate(1deg); }
+                    30% { transform: translate(3px, 2px) rotate(0deg); }
+                    40% { transform: translate(1px, -1px) rotate(1deg); }
+                    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+                    60% { transform: translate(-3px, 1px) rotate(0deg); }
+                    70% { transform: translate(3px, 1px) rotate(-1deg); }
+                    80% { transform: translate(-1px, -1px) rotate(1deg); }
+                    90% { transform: translate(1px, 2px) rotate(0deg); }
+                    100% { transform: translate(1px, -2px) rotate(-1deg); }
+                }
+                #myChart {
+                    animation: hauntedShake 0.5s infinite;
+                    filter: drop-shadow(0 0 10px rgba(0, 255, 0, 0.5));
+                }
+                #chart-wrapper {
+                    background-color: rgba(0, 0, 0, 0.8);
+                    border-radius: 10px;
+                    padding: 20px;
+                    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+                }
+            `;
+            document.head.appendChild(style);
+            break;
+
+        default:
+            console.error('Unsupported chart type');
+            return;
     }
 
-    // Special configuration for bubble chart with haunted effect
-if (page.chartType === 'bubble') {
-    const bubbleData = page.chartData.datasets[0].data;
-    chartConfig = {
-        type: 'bubble',
-        data: {
-            datasets: [{
-                label: page.chartData.datasets[0].label,
-                data: bubbleData.map((item, index) => ({
-                    x: index,
-                    y: item.y,
-                    r: item.r
-                })),
-                backgroundColor: page.chartData.datasets[0].backgroundColor.map(color => color.replace('0.2', '0.6')),
-                borderColor: page.chartData.datasets[0].borderColor,
-                borderWidth: 2
-            }]
-        },
-        options: {
-            scales: {
-                x: {
-                    type: 'category',
-                    labels: bubbleData.map(item => item.x),
-                    title: {
-                        display: true,
-                        text: 'Region',
-                        color: 'rgba(255, 255, 255, 0.8)'
-                    },
-                    ticks: {
-                        color: 'rgba(255, 255, 255, 0.8)'
-                    },
-                    grid: {
-                        color: 'rgba(255, 255, 255, 0.2)'
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Sales',
-                        color: 'rgba(255, 255, 255, 0.8)'
-                    },
-                    ticks: {
-                        color: 'rgba(255, 255, 255, 0.8)'
-                    },
-                    grid: {
-                        color: 'rgba(255, 255, 255, 0.2)'
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    labels: {
-                        color: 'rgba(255, 255, 255, 0.8)'
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `${context.raw.x}: $${context.raw.y.toLocaleString()} (${context.raw.r}% market share)`;
-                        }
-                    }
-                }
-            },
-            animation: {
-                duration: 2000,
-                easing: 'easeOutQuart'
-            }
-        }
-    };
+    // Create a new chart
+    const ctx = document.getElementById('myChart').getContext('2d');
+    myChart = new Chart(ctx, chartConfig);
 
-    // Add CSS for haunted effect
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes hauntedShake {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(3px, 2px) rotate(0deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(3px, 1px) rotate(-1deg); }
-            80% { transform: translate(-1px, -1px) rotate(1deg); }
-            90% { transform: translate(1px, 2px) rotate(0deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
+    // Ghostly bubble pulsing (only for bubble chart)
+    if (page.chartType === 'bubble') {
+        if (window.bubblePulseInterval) {
+            clearInterval(window.bubblePulseInterval);
         }
-        #myChart {
-            animation: hauntedShake 0.5s infinite;
-            filter: drop-shadow(0 0 10px rgba(0, 255, 0, 0.5));
-        }
-        #chart-wrapper {
-            background-color: rgba(0, 0, 0, 0.8);
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
-        }
-    `;
-    document.head.appendChild(style);
-
-    // Ghostly bubble pulsing
-    setInterval(() => {
-        chartConfig.data.datasets[0].data = chartConfig.data.datasets[0].data.map(bubble => ({
-            ...bubble,
-            r: bubble.r + Math.sin(Date.now() / 200) * 2
-        }));
-        myChart.update();
-    }, 50);
+        window.bubblePulseInterval = setInterval(() => {
+            myChart.data.datasets[0].data = myChart.data.datasets[0].data.map(bubble => ({
+                ...bubble,
+                r: bubble.r + Math.sin(Date.now() / 200) * 2
+            }));
+            myChart.update();
+        }, 50);
+    }
 }
 
 function adjustLayout() {
     const container = document.getElementById('container');
     const windowHeight = window.innerHeight;
     const windowWidth = window.innerWidth;
-    const aspectRatio = 3 / 2;
+    const maxWidth = 1000;
+    const aspectRatio = 2; // height:width ratio of 2:1
 
-    let containerHeight, containerWidth;
+    let containerWidth, containerHeight;
 
-    if (windowWidth / windowHeight > aspectRatio) {
-        // Window is wider than desired aspect ratio
+    // Calculate width first, capped at maxWidth
+    containerWidth = Math.min(windowWidth, maxWidth);
+
+    // Calculate height based on the aspect ratio
+    containerHeight = containerWidth * aspectRatio;
+
+    // If the calculated height is greater than the window height,
+    // recalculate width based on height
+    if (containerHeight > windowHeight) {
         containerHeight = windowHeight;
-        containerWidth = containerHeight * aspectRatio;
-    } else {
-        // Window is taller than desired aspect ratio
-        containerWidth = windowWidth;
-        containerHeight = containerWidth / aspectRatio;
+        containerWidth = containerHeight / aspectRatio;
     }
 
     container.style.width = `${containerWidth}px`;
     container.style.height = `${containerHeight}px`;
+
+    // Center the container
+    container.style.position = 'absolute';
+    container.style.left = `${(windowWidth - containerWidth) / 2}px`;
+    container.style.top = `${(windowHeight - containerHeight) / 2}px`;
 
     // Adjust font sizes
     const baseFontSize = containerHeight * 0.02; // 2% of container height
@@ -326,11 +351,6 @@ function adjustLayout() {
 
     // Reload the current page to redraw the chart with new dimensions
     loadPage(currentPageIndex);
-}
-
-    // Create a new chart
-    const ctx = document.getElementById('myChart').getContext('2d');
-    myChart = new Chart(ctx, chartConfig);
 }
 
 // Function to handle next page navigation
@@ -408,15 +428,8 @@ function addEventListeners() {
 loadPage(currentPageIndex);
 addEventListeners();
 
-// Add a resize event listener to handle orientation changes
-window.addEventListener('resize', () => {
-    loadPage(currentPageIndex);
-});
+// Add a resize event listener to handle orientation changes and adjust layout
+window.addEventListener('resize', adjustLayout);
 
-// Call adjustLayout on initial load and resize
+// Call adjustLayout on initial load
 window.addEventListener('load', adjustLayout);
-window.addEventListener('resize', adjustLayout);
-
-// Replace the existing resize event listener
-window.removeEventListener('resize', loadPage);
-window.addEventListener('resize', adjustLayout);
